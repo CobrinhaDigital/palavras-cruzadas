@@ -1,0 +1,1 @@
+Gerador de palavras cruzadas com algoritmo CSP (Constraint Satisfaction Problem)
