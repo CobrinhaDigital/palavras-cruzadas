@@ -1,4 +1,4 @@
-#!/home/beatriz/repo/palavras-cruzadas/venv/bin/python3
+#!/Users/beatriz-peixoto/Documents/repo/palavras-cruzadas/venv/bin/python3
 # -*- coding: utf-8 -*-
 import re
 import sys
