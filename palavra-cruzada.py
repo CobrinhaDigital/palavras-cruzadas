@@ -86,3 +86,92 @@ def obter_dominio(espacos, df):
     for espaco in espacos: 
         valores = df[df['palavra'].str.len() == espaco.tamanho]
         espaco.dominio = valores['palavra'].tolist()
+        
+def selecao_heuristica(espacos):
+    mrv = min(len(espaco.dominio) for espaco in espacos if espaco.preenchido == False)
+    
+    menores_dominios = [] 
+    
+    for espaco in espacos: 
+        if len(espaco.dominio) == mrv and not espaco.preenchido:
+            menores_dominios.append(espaco)
+    
+    maior_grau = max(len(dominio.cruzamentos) for dominio in menores_dominios)
+            
+    mais_vizinhos = [] 
+            
+    for espaco in menores_dominios: 
+        if len(espaco.cruzamentos) == maior_grau: 
+            mais_vizinhos.append(espaco)
+            
+    return random.choice(mais_vizinhos)
+
+def verificar_restricao(espacos, espaco, palavra): 
+    for indice, coordenadas in espaco.cruzamentos.items():
+        vizinho = espacos[indice]
+        
+        if vizinho.preenchido: 
+            for coordenada in coordenadas:
+                coord_espaco = espaco.coordenadas.index(coordenada)
+                coord_vizinho = vizinho.coordenadas.index(coordenada)
+                
+                if palavra[coord_espaco] != vizinho.palavra[coord_vizinho]:
+                    return False
+                
+    return True
+
+def backtracking(espacos):
+    if all(espaco.preenchido for espaco in espacos):
+        return True
+    
+    prox = selecao_heuristica(espacos)
+    
+    for palavra in prox.dominio:
+        if verificar_restricao(espacos, prox, palavra):
+            prox.palavra = palavra
+            prox.preenchido = True 
+            
+            if backtracking(espacos):
+                return True 
+            
+            prox.palavra = None
+            prox.preenchido = False
+            
+    return False
+
+def forward_checking(espaco, espacos):
+    for indice, coordenadas in espaco.cruzamentos.items():
+        vizinho = espacos[indice]
+        
+        if vizinho.preenchido:
+            continue
+        
+        dominio_anterior = vizinho.dominio.copy()
+        
+        for palavra in dominio_anterior:
+            for coordenada in coordenadas:
+                coord_espaco = espaco.coordenadas.index(coordenada)
+                coord_vizinho = vizinho.coordenadas.index(coordenada)
+                
+                if espaco.palavra[coord_espaco] != palavra[coord_vizinho]:
+                    vizinho.dominio.remove(palavra)
+                    break
+                
+        if not vizinho.dominio:
+            return False
+        
+    return True
+        
+        
+def reconstruir_matriz(espacos, matriz):
+    for espaco in espacos:
+        for i, (coluna, linha) in enumerate(espaco.coordenadas):
+            matriz[linha, coluna] = espaco.palavra[i]
+    return matriz
+
+def resolver(matriz, espacos):
+    if backtracking(espacos):
+        grid = reconstruir_matriz(espacos, matriz)
+        print(grid)
+    else:
+        print("Não foi possível encontrar uma solução.")
