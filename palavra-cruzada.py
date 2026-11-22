@@ -169,9 +169,11 @@ def reconstruir_matriz(espacos, matriz):
             matriz[linha, coluna] = espaco.palavra[i]
     return matriz
 
-def resolver(matriz, espacos):
-    if backtracking(espacos):
-        grid = reconstruir_matriz(espacos, matriz)
+def resolver(dimensao):
+    cruzadas = gerar_matriz(dimensao)
+    palavras = mapear_matriz(cruzadas, dimensao)
+    if backtracking(palavras):
+        grid = reconstruir_matriz(palavras, cruzadas)
         print(grid)
     else:
         print("Não foi possível encontrar uma solução.")
